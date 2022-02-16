@@ -1,73 +1,89 @@
 $(document).ready(function () {
 
-    $('#keyboard-upper-container').hide();
-    
+    let sentences = ['ten ate neite ate nee enet ite ate inet ent eate', 'Too ato too nOt enot one totA not anot tOO aNot', 'oat itain oat tain nate eate tea anne inant nean', 'itant eate anot eat nato inate eat anot tain eat', 'nee ene ate ite tent tiet ent ine ene ete ene ate']
+    let sentenceIndex = -1
+    let letterIndex = 0
+    let correct = 0
+    let incorrect = 0
+
+    $('#keyboard-upper-container').hide()
+    $('#target-letter').append(`<span id="targetSpan"></span>`)
+    nextSentence();
+
+    // Keyboard Switch Handlers
     $(document).keydown(function (e) {
         if (e.keyCode == 16) {
-            $('#keyboard-lower-container').hide();
-            $('#keyboard-upper-container').show();
+            $('#keyboard-lower-container').hide()
+            $('#keyboard-upper-container').show()
         }
     })
-    
+
     $(document).keyup(function (e) {
         if (e.keyCode == 16) {
-            $('#keyboard-upper-container').hide();
-            $('#keyboard-lower-container').show();
+            $('#keyboard-upper-container').hide()
+            $('#keyboard-lower-container').show()
         }
     })
-    
-    
-    let sentences = ['ten ate neite ate nee enet ite ate inet ent eate', 'Too ato too nOt enot one totA not anot tOO aNot', 'oat itain oat tain nate eate tea anne inant nean', 'itant eate anot eat nato inate eat anot tain eat', 'nee ene ate ite tent tiet ent ine ene ete ene ate'];
-    let currentSentence = -1;
-    let letterIndex = 0;
-    
-    
-    $(document).keypress(function(e) {
-        const keyVal = '#' + String(e.keyCode);
-        
-        $(keyVal).css('background-color', 'yellow');
-        
-        $(this).keyup(function() {
-            $(keyVal).css('background-color', '');
+
+    // Driving Force Handler
+    $(document).keypress(function (e) {
+        let keyId = '#' + String(e.keyCode)
+
+        $(keyId).css('background-color', 'yellow')
+
+        $(this).keyup(function () {
+            $(keyId).css('background-color', '')
         })
-        
-        
-        nextLetter();
+
+        letterCheck(e)
+
+        nextLetter()
+
     })
-    
-    nextSentence();
-    
+
+
     function letters() {
-        return sentences[currentSentence].split('');
+        return sentences[sentenceIndex].split('')
     }
 
-    
-
-    
     function nextSentence() {
-        currentSentence++;
-        $('#sentence').text('');
-        $.each(letters(), function(index, value) {
+        $('.glyphicon').remove()
+        $('#sentence').text('')
+        $('#targetSpan').empty()
+        sentenceIndex++
+        $.each(letters(), function (index, value) {
             $('#sentence').append(`<span id='letter${index}'>${value}</span>`)
         })
-        $('#letter0').css('background-color', 'yellow');
-        letterIndex = 0;
+        $('#letter0').css('background-color', 'yellow')
+        letterIndex = 0
+        $('#targetSpan').append(letters()[letterIndex])
     }
-    
-    
+
+    function letterCheck(e) {
+        if (e.key == letters()[letterIndex]) {
+            $('#feedback').append('<span id="glyph" class="glyphicon glyphicon-ok"></span>')
+            correct++
+        } else {
+            $('#feedback').append('<span id="glyph" class="glyphicon glyphicon-remove"></span>')
+            incorrect++
+        }
+    }
+
     function nextLetter() {
-        $(`#letter${letterIndex}`).css('background-color', 'yellow');
-        $(`#letter${letterIndex - 1}`).css('background-color', '');
-        console.log(letters()[letterIndex]);
-        letterIndex++;
+        if (letterIndex < sentences[sentenceIndex].length - 1) {
+            $(`#letter${letterIndex}`).next().css('background-color', 'yellow')
+            $('#targetSpan').empty()
+            $('#targetSpan').append(letters()[letterIndex + 1])
+            letterIndex++
+            $(`#letter${letterIndex - 1}`).css('background-color', '')
+        } else {
+            nextSentence()
+        }
     }
-    
-    
-    $('#button').click(function() {
-        nextSentence();
-    })
-    
-    $('#letterButton').click(function() {
-        nextLetter();
-    })
+
+    let d = new Date();
+
+    // console.log(sentences.join('').length)
+    // console.log(d.getTime())
+
 })
