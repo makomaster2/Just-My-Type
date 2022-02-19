@@ -8,6 +8,9 @@ let sSDate = 1;
 let start;
 let stop;
 
+let yesBtn = '<button id="reset" onClick="window.location.reload();">Yes</button>'
+let noBtn = '<button id="noReset">No</button>'
+
 $('#keyboard-upper-container').hide()
 $('#target-letter').append(`<span id="targetSpan"></span>`)
 
@@ -29,6 +32,7 @@ $(document).keyup(function (e) {
 })
 
 // Driving Force Handler
+$(document).keypress(driver)
 function driver(e) {
     let keyId = '#' + String(e.keyCode)
 
@@ -45,12 +49,8 @@ function driver(e) {
     if (sentenceIndex <= 4) {
         letterCheck(e)
         nextLetter()
-    } else {
-        endGame()
     }
 }
-
-$(document).keypress(driver)
 
 function letters() {
     return sentences[sentenceIndex].split('')
@@ -68,6 +68,8 @@ function nextSentence() {
         $('#letter0').css('background-color', 'yellow')
         letterIndex = 0
         $('#targetSpan').append(letters()[letterIndex])
+    } else {
+        endGame()
     }
 }
 
@@ -119,8 +121,28 @@ function endGame() {
     let finalTime = ((stop - start) / 1000) / 60
     let grossWPM = (240 / 5) / finalTime
     let netWPM = grossWPM - (incorrect / finalTime)
+    $('#feedback').css('margin', '30px')
     $('#feedback').append(`<h1 id='results'>RESULTS</h1>`)
     $('#feedback').append(`<p class='pt-3'><b>Gross WPM: </b>${Math.round(grossWPM)}</p>`)
     $('#feedback').append(`<p><b>Net WPM: </b>${Math.round(netWPM)}</p>`)
+
+    setTimeout(function() {
+        $('<p id="buttonMsg">Want to try again?</p>').appendTo('#feedback').css('font-weight', 'bold')
+        $(yesBtn).appendTo('#feedback').css({
+            'width': '100px',
+            'margin': '3px'
+        })
+        $(noBtn).appendTo('#feedback').css({
+            'width': '100px',
+            'margin': '3px'
+        });
+        
+        $('#noReset').on('click', function () {
+            $('#reset').remove()
+            $('#noReset').remove()
+            $('#buttonMsg').remove()
+        })
+    }, 2500)
+
     $(document).off('keypress')
 }
